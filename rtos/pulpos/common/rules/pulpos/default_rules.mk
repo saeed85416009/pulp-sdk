@@ -14,7 +14,6 @@ endif
 
 CONFIG_BUILD_DIR=$(TARGET_BUILD_DIR)
 
-
 ifdef PULP_RISCV_GCC_TOOLCHAIN_CI
 PULP_CC := $(PULP_RISCV_GCC_TOOLCHAIN_CI)/bin/$(PULP_CC)
 PULP_LD := $(PULP_RISCV_GCC_TOOLCHAIN_CI)/bin/$(PULP_LD)
@@ -46,10 +45,11 @@ PULP_APP_CFLAGS += -I$(PULPOS_HOME)/include -I$(PULPOS_HOME)/kernel -I$(PULPOS_A
 
 PULP_APP_CFLAGS += $(foreach inc,$(PULPOS_MODULES),-I$(inc)/include)
 
+$(info PULPOS_PLATFORM is $(PULPOS_PLATFORM) platform is $(platform))
+
 ifdef PULPOS_PLATFORM
 platform=$(PULPOS_PLATFORM)
 endif
-
 
 ifndef platform
 platform=gvsoc
@@ -184,7 +184,12 @@ override config_args += $(foreach file, $(HOSTFS_FILES), --config-opt=flash/cont
 
 define declare_app
 
+ifdef $(FC_USE)
 $(eval PULP_APP_SRCS_$(1) += $(PULP_APP_SRCS) $(PULP_APP_FC_SRCS) $(PULP_SRCS) $(PULP_APP_CL_SRCS) $(PULP_CL_SRCS))
+else
+$(eval PULP_APP_SRCS_$(1) += $(PULP_APP_SRCS) $(PULP_SRCS) $(PULP_APP_CL_SRCS) $(PULP_CL_SRCS))
+endif
+
 $(eval PULP_APP_ASM_SRCS_$(1) += $(PULP_APP_ASM_SRCS) $(PULP_ASM_SRCS) $(PULP_APP_CL_ASM_SRCS) $(PULP_CL_ASM_SRCS))
 $(eval PULP_APP_OBJS_$(1) += $(patsubst %.c,$(TARGET_BUILD_DIR)/$(1)/%.o,$(PULP_APP_SRCS_$(1))))
 $(eval PULP_APP_OBJS_$(1) += $(patsubst %.S,$(TARGET_BUILD_DIR)/$(1)/%.o,$(PULP_APP_ASM_SRCS_$(1))))
@@ -235,8 +240,13 @@ $(foreach app, $(PULP_APPS), $(eval $(call declare_app,$(app))))
 
 define declare_static_lib
 
+ifdef $(FC_USE)
 $(eval PULP_STATIC_LIB_SRCS_$(1) += $(PULP_STATIC_LIB_SRCS) $(PULP_STATIC_LIB_FC_SRCS)  $(PULP_STATIC_LIB_CL_SRCS) )
 $(eval PULP_STATIC_LIB_ASM_SRCS_$(1) += $(PULP_STATIC_LIB_ASM_SRCS) $(PULP_STATIC_LIB_FC_ASM_SRCS)  $(PULP_STATIC_LIB_CL_ASM_SRCS))
+else
+$(eval PULP_STATIC_LIB_SRCS_$(1) += $(PULP_STATIC_LIB_SRCS) $(PULP_STATIC_LIB_CL_SRCS) )
+$(eval PULP_STATIC_LIB_ASM_SRCS_$(1) += $(PULP_STATIC_LIB_ASM_SRCS)  $(PULP_STATIC_LIB_CL_ASM_SRCS))
+endif
 $(eval PULP_STATIC_LIB_OBJS_$(1) += $(patsubst %.c,$(TARGET_BUILD_DIR)/$(1)/%.o,$(PULP_STATIC_LIB_SRCS_$(1))))
 $(eval PULP_STATIC_LIB_OBJS_$(1) += $(patsubst %.S,$(TARGET_BUILD_DIR)/$(1)/%.o,$(PULP_STATIC_LIB_ASM_SRCS_$(1))))
 

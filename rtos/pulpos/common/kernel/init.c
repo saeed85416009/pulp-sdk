@@ -60,7 +60,35 @@ void pos_init_start()
   hal_pmu_bypass_set (ARCHI_REG_FIELD_SET (hal_pmu_bypass_get (), 1, 11, 1) );
 #endif
 
-  INIT_TRACE(POS_LOG_INFO, "Starting runtime initialization\n");
+// FILE *fp; 
+// fp = (FILE *) fopen("fc_use.txt", "r");
+// char *out;
+// out = fgetc(fp);
+// printf("%c",out);
+// fclose(fp);
+
+// int fd;
+// fd = open("fc_use.txt", O_RDONLY);
+// int out = getc(fd);
+
+printf("FC_USE inside pos_init_start \n");
+uint32_t core_mask = (1<<8) - 1;
+  if (pi_core_id()==hal_is_fc()){
+archi_write32(ARCHI_CLUSTER_PERIPHERALS_GLOBAL_ADDR(0) + ARCHI_CLUSTER_CTRL_OFFSET, 0x00000001);
+archi_write32(ARCHI_CLUSTER_PERIPHERALS_GLOBAL_ADDR(0) + ARCHI_ICACHE_CTRL_OFFSET,0xFFFFFFFF);
+archi_write32(plp_ctrl_bootaddr_get(),0x1c008080);
+// while(archi_read32(0x10000000)!= 0xc0fec0fe);
+while(1);
+}
+printf("FC_USE -none- inside pos_init_start \n");
+
+printf(" saeed.1: %d\n", pi_core_id());
+if(pi_core_id()==0)
+{
+  printf(" saeed.2: %d\n", pi_core_id());
+  archi_write32( ARCHI_SOC_PERIPHERALS_ADDR + ARCHI_APB_SOC_CTRL_OFFSET + APB_SOC_CTRL_FC_FETCH_OFFSET , 0);
+  CL_TRACE(POS_LOG_INFO, "Starting runtime initialization\n");
+  CL_TRACE(POS_LOG_INFO, "saeed: pos_init_start - core_id=%d\n",pi_core_id());
 
   pos_irq_init();
 
@@ -86,6 +114,8 @@ void pos_init_start()
 
   // Now now the minimal init are done, we can activate interruptions
   hal_irq_enable();
+}
+
 }
 
 

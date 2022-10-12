@@ -23,6 +23,18 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include <unistd.h>
+#include <inttypes.h>
 
 #include <hal/pulp.h>
 
@@ -74,6 +86,8 @@
 #include "pmsis/cluster/cluster_sync/cl_synchronisation.h"
 
 #include <pos/implem/implem.h>
+
+#include <pos/implem/pe.h>
 
 #endif
 

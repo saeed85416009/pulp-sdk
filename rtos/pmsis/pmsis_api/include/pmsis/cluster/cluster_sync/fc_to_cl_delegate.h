@@ -68,6 +68,7 @@
  * \param conf A pointer to the SPI master configuration.
  */
 void pi_cluster_conf_init(struct pi_cluster_conf *conf);
+void pi_cluster_conf_task_based_init(struct pi_cluster_conf *conf);
 
 /** \brief Open and power-up the cluster.
  * 
@@ -85,6 +86,11 @@ void pi_cluster_conf_init(struct pi_cluster_conf *conf);
  * \return          0 if the operation is successfull, -1 if there was an error.
  */
 int pi_cluster_open(struct pi_device *device);
+int pi_cluster_open_without_FC(struct pi_device *cluster_dev);
+int pi_cluster_open_without_FC_modified(struct pi_device *cluster_dev);
+int pi_cluster_open_without_FC_test(struct pi_device *cluster_dev);
+
+
 
 /** \brief Close an opened cluster device.
  *

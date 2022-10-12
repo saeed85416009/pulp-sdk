@@ -24,6 +24,9 @@
 
 #include "archi/pulp_defs.h"
 
+#ifdef FC_USE
+#define FC_CONFIG 1
+#endif
 #define PULP_CHIP CHIP_PULP
 #define PULP_CHIP_FAMILY CHIP_PULP
 #define CONFIG_PULP 1
