@@ -3,3 +3,6 @@ BUILD/
 build/
 install/
 .sconsign.dblite
+.vscode/
+backup/
+ext/

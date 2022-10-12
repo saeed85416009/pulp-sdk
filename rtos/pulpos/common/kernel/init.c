@@ -59,8 +59,16 @@ void pos_init_start()
   // Always allow JTAG accesses for now as security is not implemented
   hal_pmu_bypass_set (ARCHI_REG_FIELD_SET (hal_pmu_bypass_get (), 1, 11, 1) );
 #endif
+uint32_t core_mask = (1<<8) - 1;
+  if (pi_core_id()==hal_is_fc()){
+archi_write32(ARCHI_CLUSTER_PERIPHERALS_GLOBAL_ADDR(0) + ARCHI_CLUSTER_CTRL_OFFSET, core_mask);
+archi_write32(ARCHI_CLUSTER_PERIPHERALS_GLOBAL_ADDR(0) + ARCHI_ICACHE_CTRL_OFFSET,0xFFFFFFFF);
+archi_write32(plp_ctrl_bootaddr_get(),0x1c008080);
+hal_itc_wait_for_interrupt();
+}
 
-  INIT_TRACE(POS_LOG_INFO, "Starting runtime initialization\n");
+  CL_TRACE(POS_LOG_INFO, "Starting runtime initialization\n");
+  CL_TRACE(POS_LOG_INFO, "saeed: pos_init_start - core_id=%d\n",pi_core_id());
 
   pos_irq_init();
 
@@ -86,6 +94,7 @@ void pos_init_start()
 
   // Now now the minimal init are done, we can activate interruptions
   hal_irq_enable();
+
 }
 
 

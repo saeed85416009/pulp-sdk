@@ -75,5 +75,7 @@
 
 #include <pos/implem/implem.h>
 
+#include <pos/implem/pe.h>
+
 #endif
 

@@ -2,8 +2,15 @@ CONFIG_NB_CLUSTER_PE ?= 8
 
 PULP_LDFLAGS      += 
 PULP_CFLAGS       +=  -D__riscv__
+
+ifdef $(FC_USE)
 PULP_ARCH_CFLAGS ?=  -march=rv32imcxgap9 -mPE=$(CONFIG_NB_CLUSTER_PE) -mFC=1
 PULP_ARCH_LDFLAGS ?=  -march=rv32imcxgap9 -mPE=$(CONFIG_NB_CLUSTER_PE) -mFC=1
+else
+PULP_ARCH_CFLAGS ?=  -march=rv32imcxgap9 
+PULP_ARCH_LDFLAGS ?=  -march=rv32imcxgap9 
+endif
+
 PULP_ARCH_OBJDFLAGS ?= -Mmarch=rv32imcxgap9
 PULP_CFLAGS    += -fdata-sections -ffunction-sections -include pos/chips/pulp/config.h -I$(PULPOS_PULP_HOME)/include/pos/chips/pulp -I$(PULP_EXT_LIBS)/include
 ifeq '$(CONFIG_OPENMP)' '1'

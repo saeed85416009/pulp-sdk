@@ -357,6 +357,199 @@ void pos_cluster_push_fc_event(pi_task_t *event)
 
 extern void pos_cluster_task_slave_set_stack();
 
+int pi_cluster_open_without_FC(struct pi_device *cluster_dev)
+{
+    // printf("TEST.1");
+    struct pi_cluster_conf *conf = (struct pi_cluster_conf *)cluster_dev->config;
+    int cid = conf->id;
+    pos_cluster_t *cluster = &pos_cluster[cid];
+
+    cluster_dev->data = (void *)cluster;
+    cluster->cid = cid;
+
+    pos_cluster_init();
+
+    pos_cluster_call_pool_t *pool = (pos_cluster_call_pool_t *)pos_cluster_tiny_addr(cid, &pos_cluster_pool);
+
+    cluster->last_call_fc = NULL;
+    pool->first_call_fc_for_cl = NULL;
+    pool->first_pe_task = NULL;
+    pool->first_call_from_pe = NULL;
+
+    pos_cluster_fc_task_lock = 0;
+    // printf("TEST.2");
+
+#if __PLATFORM__ != ARCHI_PLATFORM_FPGA
+    {
+        // Setup FLL
+        int init_freq = pos_fll_init(POS_FLL_CL);
+
+        // Check if we have to restore the cluster frequency
+        // otherwise just set it to the one returned by the fll
+        int freq = pi_freq_get(PI_FREQ_DOMAIN_CL);
+
+        if (freq)
+        {
+            pi_freq_set(PI_FREQ_DOMAIN_CL, freq);
+        }
+        else
+        {
+            pos_freq_set_value(PI_FREQ_DOMAIN_CL, init_freq);
+        }
+    }
+#endif
+
+    /* Activate cluster top level clock gating */
+    cluster_ctrl_unit_clock_gate_set(ARCHI_CLUSTER_PERIPHERALS_GLOBAL_ADDR(cid) + ARCHI_CLUSTER_CTRL_OFFSET, 1);
+
+    // Initialize cluster global variables
+    pos_init_cluster_data(cid, conf);
+    
+    pos_alloc_init_l1(cid);
+
+    // Activate icache
+    cluster_icache_ctrl_enable_set(ARCHI_CLUSTER_PERIPHERALS_GLOBAL_ADDR(cid) + ARCHI_ICACHE_CTRL_OFFSET, 0xFFFFFFFF);
+
+    // Fetch all cores, they will directly jump to the PE loop waiting from orders through the dispatcher
+    for (int i=0; i<pi_cl_cluster_nb_pe_cores(); i++) 
+    {
+      GAP_WRITE(ARCHI_CLUSTER_PERIPHERALS_GLOBAL_ADDR(cid) + ARCHI_CLUSTER_CTRL_OFFSET, CLUSTER_CTRL_UNIT_BOOT_ADDR0_OFFSET + i*4, (int)_start);
+    }
+
+    uint32_t core_mask = (1<<pi_cl_cluster_nb_pe_cores()) - 1;
+
+#ifdef ARCHI_CC_CORE_ID
+    core_mask |= 1 << ARCHI_CC_CORE_ID;
+    GAP_WRITE(ARCHI_CLUSTER_PERIPHERALS_GLOBAL_ADDR(cid) + ARCHI_CLUSTER_CTRL_OFFSET, CLUSTER_CTRL_UNIT_BOOT_ADDR0_OFFSET + ARCHI_CC_CORE_ID*4, (int)_start);
+#endif
+
+    cluster_ctrl_unit_fetch_en_set(ARCHI_CLUSTER_PERIPHERALS_GLOBAL_ADDR(cid) + ARCHI_CLUSTER_CTRL_OFFSET, core_mask);
+    CL_TRACE(POS_LOG_INFO, "Cluster opened (id: %d)\n", cid);
+    return 0;
+}
+
+int pi_cluster_open_without_FC_modified(struct pi_device *cluster_dev)
+{
+    // printf("TEST.1");
+    struct pi_cluster_conf *conf = (struct pi_cluster_conf *)cluster_dev->config;
+    int cid = conf->id;
+    pos_cluster_t *cluster = &pos_cluster[cid];
+
+    cluster_dev->data = (void *)cluster;
+    cluster->cid = cid;
+
+
+    pos_cluster_call_pool_t *pool = (pos_cluster_call_pool_t *)pos_cluster_tiny_addr(cid, &pos_cluster_pool);
+
+    cluster->last_call_fc = NULL;
+    pool->first_call_fc_for_cl = NULL;
+    pool->first_pe_task = NULL;
+    pool->first_call_from_pe = NULL;
+
+    pos_cluster_fc_task_lock = 0;
+    // printf("TEST.2");
+
+#if __PLATFORM__ != ARCHI_PLATFORM_FPGA
+    {
+        // Setup FLL
+        int init_freq = pos_fll_init(POS_FLL_CL);
+
+        // Check if we have to restore the cluster frequency
+        // otherwise just set it to the one returned by the fll
+        int freq = pi_freq_get(PI_FREQ_DOMAIN_CL);
+
+        if (freq)
+        {
+            pi_freq_set(PI_FREQ_DOMAIN_CL, freq);
+        }
+        else
+        {
+            pos_freq_set_value(PI_FREQ_DOMAIN_CL, init_freq);
+        }
+    }
+#endif
+
+    // Initialize cluster global variables
+    pos_init_cluster_data(cid, conf);
+    
+    pos_alloc_init_l1(cid);
+
+   CL_TRACE(POS_LOG_INFO, "Cluster opened (id: %d)\n", cid);
+    return 0;
+}
+
+int pi_cluster_open_without_FC_test(struct pi_device *cluster_dev)
+{
+    // printf("TEST.1");
+    struct pi_cluster_conf *conf = (struct pi_cluster_conf *)cluster_dev->config;
+    int cid = conf->id;
+    pos_cluster_t *cluster = &pos_cluster[cid];
+
+    cluster_dev->data = (void *)cluster;
+    cluster->cid = cid;
+
+    pos_cluster_init();
+
+    pos_cluster_call_pool_t *pool = (pos_cluster_call_pool_t *)pos_cluster_tiny_addr(cid, &pos_cluster_pool);
+
+    cluster->last_call_fc = NULL;
+    pool->first_call_fc_for_cl = NULL;
+    pool->first_pe_task = NULL;
+    pool->first_call_from_pe = NULL;
+
+    pos_cluster_fc_task_lock = 0;
+    // printf("TEST.2");
+
+#if __PLATFORM__ != ARCHI_PLATFORM_FPGA
+    {
+        // Setup FLL
+        int init_freq = pos_fll_init(POS_FLL_CL);
+
+        // Check if we have to restore the cluster frequency
+        // otherwise just set it to the one returned by the fll
+        int freq = pi_freq_get(PI_FREQ_DOMAIN_CL);
+
+        if (freq)
+        {
+            pi_freq_set(PI_FREQ_DOMAIN_CL, freq);
+        }
+        else
+        {
+            pos_freq_set_value(PI_FREQ_DOMAIN_CL, init_freq);
+        }
+    }
+#endif
+
+    /* Activate cluster top level clock gating */
+    // cluster_ctrl_unit_clock_gate_set(ARCHI_CLUSTER_PERIPHERALS_GLOBAL_ADDR(cid) + ARCHI_CLUSTER_CTRL_OFFSET, 1);
+
+    // Initialize cluster global variables
+    pos_init_cluster_data(cid, conf);
+    
+    pos_alloc_init_l1(cid);
+
+    // Activate icache
+    // cluster_icache_ctrl_enable_set(ARCHI_CLUSTER_PERIPHERALS_GLOBAL_ADDR(cid) + ARCHI_ICACHE_CTRL_OFFSET, 0xFFFFFFFF);
+
+    // Fetch all cores, they will directly jump to the PE loop waiting from orders through the dispatcher
+    printf("pi_cl_cluster_nb_pe_cores():%d",pi_cl_cluster_nb_pe_cores());
+    CL_TRACE(POS_LOG_TRACE, "saeed: pi_cl_cluster_nb_pe_cores() %d\n", pi_cl_cluster_nb_pe_cores());
+    for (int i=0; i<pi_cl_cluster_nb_pe_cores(); i++) 
+    {
+      GAP_WRITE(ARCHI_CLUSTER_PERIPHERALS_GLOBAL_ADDR(cid) + ARCHI_CLUSTER_CTRL_OFFSET, CLUSTER_CTRL_UNIT_BOOT_ADDR0_OFFSET + i*4, (int)_start);
+    }
+
+    uint32_t core_mask = (1<<pi_cl_cluster_nb_pe_cores()) - 1;
+
+#ifdef ARCHI_CC_CORE_ID
+    core_mask |= 1 << ARCHI_CC_CORE_ID;
+    GAP_WRITE(ARCHI_CLUSTER_PERIPHERALS_GLOBAL_ADDR(cid) + ARCHI_CLUSTER_CTRL_OFFSET, CLUSTER_CTRL_UNIT_BOOT_ADDR0_OFFSET + ARCHI_CC_CORE_ID*4, (int)_start);
+#endif
+
+    cluster_ctrl_unit_fetch_en_set(ARCHI_CLUSTER_PERIPHERALS_GLOBAL_ADDR(cid) + ARCHI_CLUSTER_CTRL_OFFSET, core_mask);
+    CL_TRACE(POS_LOG_INFO, "Cluster opened (id: %d)\n", cid);
+    return 0;
+}
 
 
 #ifdef CONFIG_PE_TASK
@@ -380,5 +573,7 @@ void pos_cluster_task_set_stacks(struct pi_cluster_task *cluster_task, void *sta
 
     pi_cl_cluster_task_terminate(cluster_task);
 }
+
+
 
 #endif

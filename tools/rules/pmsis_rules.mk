@@ -120,6 +120,8 @@ PULP_LDFLAGS += $(APP_LDFLAGS) $(COMMON_LDFLAGS)
 BUILDDIR      = $(CURDIR)/BUILD/$(TARGET_CHIP)/GCC_RISCV/$(build_dir_ext)
 TARGET_BUILD_DIR = $(BUILDDIR)
 
+$(info  PULPOS_HOME   is $(PULPOS_HOME))
+
 include $(PULPOS_HOME)/rules/pulpos.mk
 
 BIN           = $(TARGETS)

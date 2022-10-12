@@ -10,6 +10,8 @@ APP_CFLAGS += -DNUM_CORES=1
 endif
 endif
 
+$(info  RULES_DIR   is $(RULES_DIR))
+
 APP_CFLAGS += -Os -g
 APP_LDFLAGS += -Os -g
 

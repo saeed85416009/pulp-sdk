@@ -115,11 +115,11 @@
 #endif
 
 
-#if !defined(__TRACE_ALL__) && !defined(__TRACE_CL__)
+// #if !defined(__TRACE_ALL__) && !defined(__TRACE_CL__)
 #define CL_TRACE(x...)
-#else
-#define CL_TRACE(level, x...) POS_TRACE(level, "[CL] " x)
-#endif
+// #else
+// #define CL_TRACE(level, x...) POS_TRACE(level, "[CL] " x)
+// #endif
 
 
 #if !defined(__TRACE_ALL__) && !defined(__TRACE_UART__)
