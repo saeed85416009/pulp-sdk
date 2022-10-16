@@ -314,14 +314,12 @@ int pi_cluster_send_tasklet_to_cl_async(struct pi_device *device, struct pi_clus
 int pi_cluster_send_task_to_cl(struct pi_device *device, struct pi_cluster_task *task)
 {
     pi_task_t fc_task;
-
     pi_task_block(&fc_task);
 
     if (pi_cluster_send_task_to_cl_async(device, task, &fc_task))
     {
         return -1;
     }
-
     pi_task_wait_on(&fc_task);
 
     return 0;
@@ -532,8 +530,6 @@ int pi_cluster_open_without_FC_test(struct pi_device *cluster_dev)
     // cluster_icache_ctrl_enable_set(ARCHI_CLUSTER_PERIPHERALS_GLOBAL_ADDR(cid) + ARCHI_ICACHE_CTRL_OFFSET, 0xFFFFFFFF);
 
     // Fetch all cores, they will directly jump to the PE loop waiting from orders through the dispatcher
-    printf("pi_cl_cluster_nb_pe_cores():%d",pi_cl_cluster_nb_pe_cores());
-    CL_TRACE(POS_LOG_TRACE, "saeed: pi_cl_cluster_nb_pe_cores() %d\n", pi_cl_cluster_nb_pe_cores());
     for (int i=0; i<pi_cl_cluster_nb_pe_cores(); i++) 
     {
       GAP_WRITE(ARCHI_CLUSTER_PERIPHERALS_GLOBAL_ADDR(cid) + ARCHI_CLUSTER_CTRL_OFFSET, CLUSTER_CTRL_UNIT_BOOT_ADDR0_OFFSET + i*4, (int)_start);

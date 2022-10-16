@@ -19,8 +19,9 @@
  */
 #ifndef _UART_H
 #define _UART_H
-
 #include <stdint.h>
+#define CLUSTER_UART
+
 #ifdef CLUSTER_UART
   #define UART_BASE_ADDR 0x1A222000
 #else

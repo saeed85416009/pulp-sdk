@@ -159,13 +159,16 @@ static inline void pi_cluster_pe_piped_task_push(pi_cluster_pe_task_t *task, pi_
 
 static inline void pi_cl_team_fork(int nb_cores, void (*entry)(void *), void *arg)
 {
+    pulp_write32(0x1000fff0,52);
     pos_team_offload(nb_cores, entry, arg);
+    pulp_write32(0x1000fff0,53);
 
 #ifndef ARCHI_CC_CORE_ID
     entry(arg);
 #endif
-
+    pulp_write32(0x1000fff0,54);
     pos_team_offload_wait();
+    pulp_write32(0x1000fff0,55);
 }
 
 

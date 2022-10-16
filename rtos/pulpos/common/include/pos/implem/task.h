@@ -39,12 +39,10 @@ static inline void pi_task_destroy(pi_task_t *task)
 static inline void pi_task_wait_on(struct pi_task *task)
 {
     int irq = hal_irq_disable();
-
     while(likely(task->done == 0))
     {
         pos_task_handle();
     }
-
     hal_irq_restore(irq);
 }
 

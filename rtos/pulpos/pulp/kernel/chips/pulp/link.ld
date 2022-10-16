@@ -3,10 +3,10 @@ OUTPUT_ARCH(riscv)
 ENTRY( _start )
 MEMORY
 {
-  L2           : ORIGIN = 0x1c000004, LENGTH = 0x0007fffc
-  L2_aliased   : ORIGIN = 0x00000004, LENGTH = 0x00003ffc
-  L1                 : ORIGIN = 0x10000004, LENGTH = 0x0000fffc
-  L1_aliased         : ORIGIN = 0x00000004, LENGTH = 0x0000fffc
+  L2           : ORIGIN = 0x1c000000, LENGTH = 0x0007fffc
+  L2_aliased   : ORIGIN = 0x1c000000, LENGTH = 0x00003ffc
+  L1                 : ORIGIN = 0x10000000, LENGTH = 0x0000fffc
+  L1_aliased         : ORIGIN = 0x10000000, LENGTH = 0x0000fffc
 }
 
 /*
@@ -276,6 +276,7 @@ SECTIONS
   __l1_end = ALIGN(4);
 
   __l2_shared_end = LOADADDR(.bss_l1) + SIZEOF(.bss_l1);
+
 
 
 

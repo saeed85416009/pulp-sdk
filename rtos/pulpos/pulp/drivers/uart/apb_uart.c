@@ -23,6 +23,7 @@
  *              that we use the SoC clock divided by 16*32 = 512.
  */
 void uart_set_cfg(int parity, uint16_t clk_counter) {
+   pulp_write32(0x10001000,0xfeedfedd);
   unsigned int i;
   *(volatile unsigned int*)(UART_REG_LCR) = 0x83; //sets 8N1 and set DLAB to 1
   *(volatile unsigned int*)(UART_REG_DLM) = (clk_counter >> 8) & 0xFF;
@@ -35,7 +36,7 @@ void uart_set_cfg(int parity, uint16_t clk_counter) {
 
 void uart_send(const char* str, unsigned int len) {
   unsigned int i;
-
+  pulp_write32(0x10001000,0xfeedfeed);
   while(len > 0) {
     // process this in batches of 16 bytes to actually use the FIFO in the UART
 
@@ -58,6 +59,7 @@ char uart_getchar() {
 }
 
 void uart_sendchar(const char c) {
+   pulp_write32(0x10001000,0xfeedfddd);
   // wait until there is space in the fifo
   while( (*(volatile unsigned int*)(UART_REG_LSR) & 0x20) == 0);
 

@@ -27,14 +27,14 @@ pos_init_entry:
     # Performance counters are active after reset, deactivate them to let the
     # user control when they should start counting
     csrw    0x7A1, x0
-#if 0
-## ifdef ARCHI_HAS_CLUSTER
 
+#ifdef ARCHI_HAS_CLUSTER
+##if 0
     # Cluster PEs will also starts here to avoid aligning another entry point
     # Just re-route them to the right entry
     csrr    a0, 0xF14
     andi    a1, a0, 0x1f
-    srli    a0, a0, 5
+    srli    a0, a0, 10
     li      a2, ARCHI_FC_CID
     bne     a0, a2, pos_pe_start
 
@@ -45,9 +45,9 @@ pos_init_entry:
     # la      t0, _bss_start
     # la      t1, _bss_end
 1:
-    # sw      zero,0(t0)
-    # addi    t0, t0, 4
-    # bltu    t0, t1, 1b
+    sw      zero,0(t0)
+    addi    t0, t0, 4
+    bltu    t0, t1, 1b
 
 
 
@@ -57,25 +57,25 @@ pos_init_entry:
 
 
     /* Do all other initializations from C code */
-    la   t0, pos_init_start
-    jalr x1, t0
-    # li  t0, 15
-    # lui	t1,0x10010
-    # sw	t0,-8(t1)
-    la    t2, main
-    jalr  x1, t2
-    mv    s0, a0
+    # la   t0, pos_init_start
+    # jalr x1, t0
+    # Jump to main program entry point (argc = a0, argv = a1).
+
+
+
 
 .section .text_l2
 
     # On all other chips we simply pass 0.
     # addi  a0, x0, 0
     # addi  a1, x0, 0
-
+    # li  t0, 15
+    # lui	t1,0x10010
+    # sw	t0,-8(t1)
     # Jump to main program entry point (argc = a0, argv = a1).
-    # la    t2, main
-    # jalr  x1, t2
-    # mv    s0, a0
+    la    t2, main
+    jalr  x1, t2
+    mv    s0, a0
 
     # If program returns from main, call exit routine
     mv   a0, s0
@@ -146,4 +146,3 @@ pos_no_irq_handler:
 pos_semihosting_call:
     ebreak
     jr          ra
-

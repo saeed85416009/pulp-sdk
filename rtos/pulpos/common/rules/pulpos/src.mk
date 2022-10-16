@@ -8,13 +8,6 @@ endef
 
 $(foreach module, $(PULPOS_MODULES), $(eval $(call include_target,$(module))))
 
-ifdef FC_USE
-$(file  >$(PULPOS_HOME)/kernel/fc_use.txt,1)
-else
-$(file  >$(PULPOS_HOME)/kernel/fc_use.txt,0)
-endif
-
-
 ifeq '$(CONFIG_CRT0)' '1'
 PULP_ASM_SRCS += kernel/crt0.S
 endif
@@ -82,7 +75,7 @@ endif
 ifeq '$(CONFIG_UART)' '1'
 ifneq '$(udma/uart/version)' ''
 CONFIG_UDMA = 1
-ifdef FC_USE
+ifndef EXCLUDE_FC
 PULP_SRCS += drivers/uart/uart-v$(udma/uart/version).c
 else
 PULP_SRCS += drivers/uart/apb_uart.c

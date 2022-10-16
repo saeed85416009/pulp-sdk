@@ -3,12 +3,12 @@ CONFIG_NB_CLUSTER_PE ?= 8
 PULP_LDFLAGS      += 
 PULP_CFLAGS       +=  -D__riscv__
 
-ifdef $(FC_USE)
+ifndef $(EXCLUDE_FC)
 PULP_ARCH_CFLAGS ?=  -march=rv32imcxgap9 -mPE=$(CONFIG_NB_CLUSTER_PE) -mFC=1
 PULP_ARCH_LDFLAGS ?=  -march=rv32imcxgap9 -mPE=$(CONFIG_NB_CLUSTER_PE) -mFC=1
 else
-PULP_ARCH_CFLAGS ?=  -march=rv32imcxgap9 
-PULP_ARCH_LDFLAGS ?=  -march=rv32imcxgap9 
+PULP_ARCH_CFLAGS ?=  -march=rv32imcxgap9 -mPE=$(CONFIG_NB_CLUSTER_PE) -mFC=1
+PULP_ARCH_LDFLAGS ?=  -march=rv32imcxgap9 -mPE=$(CONFIG_NB_CLUSTER_PE) -mFC=1
 endif
 
 PULP_ARCH_OBJDFLAGS ?= -Mmarch=rv32imcxgap9

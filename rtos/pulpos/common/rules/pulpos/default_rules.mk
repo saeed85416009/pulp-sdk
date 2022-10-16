@@ -45,7 +45,7 @@ PULP_APP_CFLAGS += -I$(PULPOS_HOME)/include -I$(PULPOS_HOME)/kernel -I$(PULPOS_A
 
 PULP_APP_CFLAGS += $(foreach inc,$(PULPOS_MODULES),-I$(inc)/include)
 
-$(info PULPOS_PLATFORM is $(PULPOS_PLATFORM) platform is $(platform))
+# $(info PULPOS_PLATFORM is $(PULPOS_PLATFORM) platform is $(platform))
 
 ifdef PULPOS_PLATFORM
 platform=$(PULPOS_PLATFORM)
@@ -105,6 +105,12 @@ endif
 
 ifdef CONFIG_RISCV_GENERIC
 PULP_CFLAGS += -D__RISCV_GENERIC__=1
+endif
+
+ifdef EXCLUDE_FC
+PULP_CFLAGS  += -DARCHI_HAS_FC=0
+else
+PULP_CFLAGS  += -DARCHI_HAS_FC=1
 endif
 
 ifdef CONFIG_USE_ASM_OPTIM
@@ -184,7 +190,7 @@ override config_args += $(foreach file, $(HOSTFS_FILES), --config-opt=flash/cont
 
 define declare_app
 
-ifdef $(FC_USE)
+ifndef $(EXCLUDE_FC)
 $(eval PULP_APP_SRCS_$(1) += $(PULP_APP_SRCS) $(PULP_APP_FC_SRCS) $(PULP_SRCS) $(PULP_APP_CL_SRCS) $(PULP_CL_SRCS))
 else
 $(eval PULP_APP_SRCS_$(1) += $(PULP_APP_SRCS) $(PULP_SRCS) $(PULP_APP_CL_SRCS) $(PULP_CL_SRCS))
@@ -240,7 +246,7 @@ $(foreach app, $(PULP_APPS), $(eval $(call declare_app,$(app))))
 
 define declare_static_lib
 
-ifdef $(FC_USE)
+ifndef $(EXCLUDE_FC)
 $(eval PULP_STATIC_LIB_SRCS_$(1) += $(PULP_STATIC_LIB_SRCS) $(PULP_STATIC_LIB_FC_SRCS)  $(PULP_STATIC_LIB_CL_SRCS) )
 $(eval PULP_STATIC_LIB_ASM_SRCS_$(1) += $(PULP_STATIC_LIB_ASM_SRCS) $(PULP_STATIC_LIB_FC_ASM_SRCS)  $(PULP_STATIC_LIB_CL_ASM_SRCS))
 else
