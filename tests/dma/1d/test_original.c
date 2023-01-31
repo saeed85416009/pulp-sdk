@@ -25,10 +25,11 @@ static char *loc_buff;
 static void cluster_entry(void *arg)
 {
   //printf("(%d, %d) Entered cluster got ptr %p\n", cl_cluster_id(), cl_core_id(), loc_buff);
-  printf("cluster_entry.1");
+
   for (int j=0; j<NB_ITER; j++)
   {
     pi_cl_dma_cmd_t copy[NB_COPY];
+    // programming NB_ITER time dma 
     for (int i=0; i<NB_COPY; i++)
       pi_cl_dma_cmd((int)ext_buff0 + COPY_SIZE*i + ITER_SIZE*j, (int)loc_buff + COPY_SIZE*i + ITER_SIZE*j, COPY_SIZE, PI_CL_DMA_DIR_EXT2LOC, &copy[i]);
 
@@ -47,34 +48,36 @@ static void cluster_entry(void *arg)
     for (int i=0; i<NB_COPY; i++)
       pi_cl_dma_cmd_wait(&copy[i]);
   }
-  printf("cluster_entry.10");
 }
 
 static int test_entry()
 {
-  printf("Entering main controllerrrrrrrrr\n");
+  printf("Entering main controller\n");
 
 #if 1 //ef ARCHI_HAS_FC
+
   struct pi_device cluster_dev;
   struct pi_cluster_conf conf;
   struct pi_cluster_task cluster_task;
   struct pi_task task;
+
   pi_cluster_conf_init(&conf);
 
   pi_open_from_conf(&cluster_dev, &conf);
+    
   pi_cluster_open(&cluster_dev);
+
   loc_buff = pmsis_l1_malloc(BUFF_SIZE);
-  printf("test.3\n");
+
   for (int i=0; i<BUFF_SIZE; i++)
   {
-    printf("test.4.%d\n", i);
     ext_buff0[i] = i;
   }
-  printf("test.5\n");
+
   pi_cluster_task(&cluster_task, cluster_entry, NULL);
-  printf("test.6\n");
+
   pi_cluster_send_task_to_cl(&cluster_dev, &cluster_task);
-  printf("test.7\n");
+
   for (int i=0; i<BUFF_SIZE; i++)
   {
     if (ext_buff1[i] != (char)(i * 3)) {
@@ -82,7 +85,7 @@ static int test_entry()
       return -1;
     }
   }
-  printf("test.7\n");
+
   pi_cluster_close(&cluster_dev);
 
 #else
